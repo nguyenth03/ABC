@@ -55,6 +55,7 @@ public class Boss1 : MonoBehaviour
     {
         if (collision.gameObject.tag == "PlayerAction")
         {
+            anim.SetTrigger("death");
             Destroy("gameObject");
         }
     }

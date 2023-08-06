@@ -11,7 +11,6 @@ public class PlayerS : MonoBehaviour
     public SpriteRenderer sprite;
     public Rigidbody2D rb;
     private BoxCollider2D coll;
-    bool stateTrap = false;
     private enum MovementState { idle, running, jumping, falling }
 
     public LayerMask jumpableGround;
@@ -42,10 +41,6 @@ public class PlayerS : MonoBehaviour
         
         dirX = Input.GetAxisRaw("Horizontal");
         rb.velocity = new Vector2(dirX * moveSpeed, rb.velocity.y);
-        if (IsGrounded() && stateTrap == true)
-        {
-            stateTrap = false;
-        }
         if (Input.GetButtonDown("Jump") && IsGrounded())
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
@@ -68,8 +63,8 @@ public class PlayerS : MonoBehaviour
     }
 
     private void Attack(){
-        actack.SetActive(true);
         if(Input.GetKeyDown(KeyCode.A)){
+            actack.SetActive(true);
             actack.transform.position = actack.transform.position + new Vector3(gameObject.transform.position.x,gameObject.transform.position.y, 0);
                 
         }
@@ -82,13 +77,13 @@ public class PlayerS : MonoBehaviour
         {
             state = MovementState.running;
             sprite.flipX = false;
-            bool.transform.localScale = -bool.transform.localScale;
+            bool.transform.localScale = bool.transform.localScale;
         }
         else if (dirX < 0f)
         {
             state = MovementState.running;
             sprite.flipX = true;
-            transform.localScale = bool.transform.localScale;
+            transform.localScale = -bool.transform.localScale;
         }
         else
         {
@@ -123,12 +118,12 @@ public class PlayerS : MonoBehaviour
     {
         if (collision.gameObject.tag == "Trap")
         {
+            gameObject.transform.SetParent("null");
             if (TakeDamege(2) <= 0)
             {
                 RestartLevel();
             }
-                TakeDamege(4);
-            }
+            TakeDamege(4);
         }
     }
 
@@ -137,11 +132,10 @@ public class PlayerS : MonoBehaviour
     {
         if (collision.gameObject.tag == "Trap")
         {
+            bool.transform.position = bool.transform.position + new Vector3(gameObject.transform.position.x,gameObject.transform.position.y, 0);
             bool.SetActive(true);
             if (Random.Range(1, 9) / 2 == 0)
             {
-                bool.transform.position = bool.transform.position + new Vector3(gameObject.transform.position.x,gameObject.transform.position.y, 0);
-                //Instantiate(bool, new Vector2(gameObject.transform.position.x,gameObject.transform.position.y), Quaternion.identity);
                 if (TakeDamege(2) <= 0)
                 {
                     RestartLevel();
@@ -152,10 +146,22 @@ public class PlayerS : MonoBehaviour
         }
     }
 
+     void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "Wind")
+        {
+           NextChap();
+        }
+    }
+
     private void Die()
     {
         rb.bodyType = RigidbodyType2D.Static;
         anim.SetTrigger("death");
+    }
+
+    private void NextChap(){
+        SceneManager.LoadScene(NextScene); 
     }
 
     private void RestartLevel()

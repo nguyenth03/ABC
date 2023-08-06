@@ -16,7 +16,6 @@ public class AttackBall : MonoBehaviour
             move = gameObject.transform.position.x - 3f;
             Move(dirX);
         }   
-        Destroy(dirX);
     }
 
 
